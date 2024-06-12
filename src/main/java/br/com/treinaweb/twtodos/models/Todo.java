@@ -1,10 +1,15 @@
 package br.com.treinaweb.twtodos.models;
 
+
 import jakarta.persistence.*;
+import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 @Entity
 public class Todo {
@@ -12,17 +17,30 @@ public class Todo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @NotBlank
+    @Size(min = 3, max = 100)
     @Column(length = 100, nullable = false)
     private String title;
+
     @Column(nullable = false)
     private LocalDateTime createdAt;
+
+    @NotNull
+    @FutureOrPresent
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     @Column(nullable = false)
     private LocalDate deadline;
+
     @Column(nullable = true)
     private LocalDate fineshedAt;
 
     public Todo(){
         this.createdAt = LocalDateTime.now();
+    }
+
+    public void markHasFinished(){
+        this.fineshedAt = LocalDate.now();
     }
 
     public Long getId() {
@@ -66,23 +84,33 @@ public class Todo {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Todo todo = (Todo) o;
-        return Objects.equals(id, todo.id);
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((id == null) ? 0 : id.hashCode());
+        return result;
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hashCode(id);
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Todo other = (Todo) obj;
+        if (id == null) {
+            if (other.id != null)
+                return false;
+        } else if (!id.equals(other.id))
+            return false;
+        return true;
     }
 
     @Override
     public String toString() {
-        return "Todo{" +
-                "id=" + id +
-                ", title='" + title + '\'' +
-                '}';
+        return "Todo [id=" + id + ", title=" + title + "]";
     }
+
 }
